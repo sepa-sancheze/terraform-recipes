@@ -34,3 +34,13 @@ resource "aws_route_table" "tf-RouteTable" {
     Name = "tf-RouteTable"
   }
 }
+
+# Subnet creation
+resource "aws_subnet" "tf-Subnet" {
+  vpc_id            = aws_vpc.tf-VPC.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "us-east-1a"
+  tags = {
+    Name = "tf-Subnet"
+  }
+}
