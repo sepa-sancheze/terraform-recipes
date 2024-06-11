@@ -44,3 +44,10 @@ resource "aws_subnet" "tf-Subnet" {
     Name = "tf-Subnet"
   }
 }
+
+# Route Table Association Creation
+resource "aws_route_table_association" "rf-RouteTableAssociation" {
+  subnet_id      = aws_subnet.tf-Subnet.id
+  route_table_id = aws_route_table.tf-RouteTable.id
+}
+
