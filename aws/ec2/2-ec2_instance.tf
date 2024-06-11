@@ -51,3 +51,43 @@ resource "aws_route_table_association" "rf-RouteTableAssociation" {
   route_table_id = aws_route_table.tf-RouteTable.id
 }
 
+# Security Group Creation
+resource "aws_security_group" "tf-SecurityGroupWebServers" {
+  name        = "allow_web_traffic"
+  description = "Allow HTTP(s) and SSH connections"
+  vpc_id      = aws_vpc.tf-VPC.id
+
+  tags = {
+    Name = "tf-SecurityGroupWebServers"
+  }
+}
+
+# Security Group Ingress Rules Creation
+resource "aws_vpc_security_group_ingress_rule" "tf-AllowTLS-Rule" {
+  security_group_id = aws_security_group.tf-SecurityGroup.id
+  cidr_ipv4         = aws_vpc.tf-VPC.cidr_block
+  ip_protocol       = "tcp"
+  from_port         = 443
+  to_port           = 443
+}
+resource "aws_vpc_security_group_ingress_rule" "tf-AllowHTTP-Rule" {
+  security_group_id = aws_security_group.tf-SecurityGroup.id
+  cidr_ipv4         = aws_vpc.tf-VPC.cidr_block
+  ip_protocol       = "tcp"
+  from_port         = 80
+  to_port           = 80
+}
+resource "aws_vpc_security_group_ingress_rule" "tf-AllowSSH-Rule" {
+  security_group_id = aws_security_group.tf-SecurityGroup.id
+  cidr_ipv4         = aws_vpc.tf-VPC.cidr_block
+  ip_protocol       = "tcp"
+  from_port         = 22
+  to_port           = 22
+}
+
+# Security Group Egress Rules Creation
+resource "aws_vpc_security_group_egress_rule" "tf-AllowAllEgress-Rule" {
+  security_group_id = aws_security_group.tf-SecurityGroup.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+}
