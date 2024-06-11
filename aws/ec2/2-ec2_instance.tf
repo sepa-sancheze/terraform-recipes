@@ -63,23 +63,23 @@ resource "aws_security_group" "tf-SecurityGroupWebServers" {
 }
 
 # Security Group Ingress Rules Creation
-resource "aws_vpc_security_group_ingress_rule" "tf-AllowTLS-Rule" {
+resource "aws_vpc_security_group_ingress_rule" "tf-AllowHTTPS-Rule" {
   security_group_id = aws_security_group.tf-SecurityGroup.id
-  cidr_ipv4         = aws_vpc.tf-VPC.cidr_block
+  cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
 }
 resource "aws_vpc_security_group_ingress_rule" "tf-AllowHTTP-Rule" {
   security_group_id = aws_security_group.tf-SecurityGroup.id
-  cidr_ipv4         = aws_vpc.tf-VPC.cidr_block
+  cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "tcp"
   from_port         = 80
   to_port           = 80
 }
 resource "aws_vpc_security_group_ingress_rule" "tf-AllowSSH-Rule" {
   security_group_id = aws_security_group.tf-SecurityGroup.id
-  cidr_ipv4         = aws_vpc.tf-VPC.cidr_block
+  cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "tcp"
   from_port         = 22
   to_port           = 22
