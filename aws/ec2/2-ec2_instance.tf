@@ -1,16 +1,36 @@
-resource "aws_vpc" "tf_vpc" {
+# VPC Creation
+resource "aws_vpc" "tf-VPC" {
   cidr_block = "10.0.0.0/16"
 
   tags = {
-    Name = "production_vpc"
+    Name = "tf-VPC"
   }
 }
 
-resource "aws_subnet" "main" {
-  vpc_id     = aws_vpc.tf_vpc.id
-  cidr_block = "10.0.1.0/24"
+# Internet Gateway Creation
+resource "aws_internet_gateway" "tf-InternetGateway" {
+  vpc_id = aws_vpc.tf-VPC.id
 
   tags = {
-    Name = "production_subnet"
+    Name = "tf-InternetGateway"
+  }
+}
+
+# Route Table Creation
+resource "aws_route_table" "tf-RouteTable" {
+  vpc_id = aws_vpc.tf-VPC.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.tf-InternetGateway.id
+  }
+
+  route {
+    ipv6_cidr_block        = "::/0"
+    egress_only_gateway_id = aws_internet_gateway.tf-InternetGateway.id
+  }
+
+  tags = {
+    Name = "tf-RouteTable"
   }
 }
