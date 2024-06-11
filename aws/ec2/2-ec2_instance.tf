@@ -26,8 +26,8 @@ resource "aws_route_table" "tf-RouteTable" {
   }
 
   route {
-    ipv6_cidr_block        = "::/0"
-    egress_only_gateway_id = aws_internet_gateway.tf-InternetGateway.id
+    ipv6_cidr_block = "::/0"
+    gateway_id      = aws_internet_gateway.tf-InternetGateway.id
   }
 
   tags = {
@@ -64,21 +64,21 @@ resource "aws_security_group" "tf-SecurityGroupWebServers" {
 
 # Security Group Ingress Rules Creation
 resource "aws_vpc_security_group_ingress_rule" "tf-AllowHTTPS-Rule" {
-  security_group_id = aws_security_group.tf-SecurityGroup.id
+  security_group_id = aws_security_group.tf-SecurityGroupWebServers.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "tcp"
   from_port         = 443
   to_port           = 443
 }
 resource "aws_vpc_security_group_ingress_rule" "tf-AllowHTTP-Rule" {
-  security_group_id = aws_security_group.tf-SecurityGroup.id
+  security_group_id = aws_security_group.tf-SecurityGroupWebServers.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "tcp"
   from_port         = 80
   to_port           = 80
 }
 resource "aws_vpc_security_group_ingress_rule" "tf-AllowSSH-Rule" {
-  security_group_id = aws_security_group.tf-SecurityGroup.id
+  security_group_id = aws_security_group.tf-SecurityGroupWebServers.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "tcp"
   from_port         = 22
@@ -87,7 +87,7 @@ resource "aws_vpc_security_group_ingress_rule" "tf-AllowSSH-Rule" {
 
 # Security Group Egress Rules Creation
 resource "aws_vpc_security_group_egress_rule" "tf-AllowAllEgress-Rule" {
-  security_group_id = aws_security_group.tf-SecurityGroup.id
+  security_group_id = aws_security_group.tf-SecurityGroupWebServers.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
 }
@@ -98,8 +98,20 @@ resource "aws_network_interface" "tf-NetworkInterface" {
   private_ips     = ["10.0.1.20"]
   security_groups = [aws_security_group.tf-SecurityGroupWebServers.id]
 }
-resource "aws_eip" "one" {
+resource "aws_eip" "tf-EIP" {
   domain            = "vpc"
   network_interface = aws_network_interface.tf-NetworkInterface.id
   depends_on        = [aws_internet_gateway.tf-InternetGateway]
+}
+
+# EC2 Instance Creation
+resource "aws_instance" "tf-EC2Instance" {
+  ami               = "ami-0e001c9271cf7f3b9"
+  instance_type     = "t2.micro"
+  availability_zone = "us-east-1a"
+  key_name          = "Terraform_KeyPairEC2Instances"
+  network_interface {
+    network_interface_id = aws_network_interface.tf-NetworkInterface.id
+    device_index         = 0
+  }
 }
