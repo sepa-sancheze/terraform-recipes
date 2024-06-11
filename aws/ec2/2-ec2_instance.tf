@@ -91,3 +91,15 @@ resource "aws_vpc_security_group_egress_rule" "tf-AllowAllEgress-Rule" {
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
 }
+
+# Network Interface Creation
+resource "aws_network_interface" "tf-NetworkInterface" {
+  subnet_id       = aws_subnet.tf-Subnet.id
+  private_ips     = ["10.0.1.20"]
+  security_groups = [aws_security_group.tf-SecurityGroupWebServers.id]
+}
+resource "aws_eip" "one" {
+  domain            = "vpc"
+  network_interface = aws_network_interface.tf-NetworkInterface.id
+  depends_on        = [aws_internet_gateway.tf-InternetGateway]
+}
